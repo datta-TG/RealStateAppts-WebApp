@@ -1,0 +1,1 @@
+{"spring": {"mean": 13.5}, "summer": {"mean": 23.666666666666668}, "fall": {"mean": 22.071428571428573}, "winter": {"mean": 11.125}, "normalizationType": "submean"}
