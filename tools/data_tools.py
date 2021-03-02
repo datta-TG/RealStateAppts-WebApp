@@ -48,3 +48,16 @@ def to_end_date(date):
 def get_years(df):
     return list(
         set(np.array(pd.DatetimeIndex(df['start_date']).year)))
+
+
+def has_stacionality(df):
+    signal = df['appts_per_listing']
+    ft_ = np.fft.fft(signal) / len(signal)  # Normalize amplitude and apply the FFT
+    ft_ = ft_[range(int(len(signal)/2))]   # Exclude sampling frequency
+    ft_ = abs(ft_)
+    ft = ft_.tolist()
+    max_value_index = ft.index(max(ft_))
+    if max_value_index == 0:
+        return True
+    else:
+        return False

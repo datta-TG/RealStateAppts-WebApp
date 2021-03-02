@@ -1,12 +1,15 @@
+import os
 import datetime
 import streamlit as st
 import pandas as pd
 from tools.data_tools import *
 
+
 @st.cache
 def upload_data(database):
     with st.spinner(text='Uploading...'):
         df_uploaded = pd.read_excel(database)
+        
     return df_uploaded
 
 @st.cache
@@ -25,7 +28,6 @@ def cleaning_data(df):
     df_out = df.copy(deep=True)
     df_out['zip_code'] = df_out['zip_code'].apply(
         lambda x: str(x)[:zipcodelen])
-
     df_out = quitOutliers(df_out, 'appts_per_listing')
     df_out['listings'] = df_out['appts']/df_out['appts_per_listing']
 
@@ -41,7 +43,7 @@ def cleaning_data(df):
 def page_upload_database():
     st.title("Upload new database")
     st.write("The new database **must** have this 4 columns:**appts**, **appts_per_listing** , **start_date** and **zip_code**")
-    database = st.file_uploader("Upload the new database", type=['xlsx'])
+    database = st.file_uploader("Upload the new database", type=['xlsx','xls'])
     if(database):
         error_message = st.empty()
         df_raw = upload_data(database)

@@ -65,6 +65,10 @@ def plot_time_series(df, years, subheader,periods,periods_number,seasonality = F
 def show_plots(df,years_list,periods_list,periods_number_list,dictionary_encoding,key = 1):
     st.subheader("Time series plot")
     df_without_seasonality = quitSeasonality(df)
+    if(not has_stacionality(df)):
+        st.warning("Seasonality is not detected in this zip")
+    else:
+        st.success("Seasonality detected")
     years = st.multiselect(
         'Select the years you want to visualize', years_list,key = (4*key))
     seasonality_year_checkbox = st.checkbox("Show without seasonality",key= (4*key)+1)
