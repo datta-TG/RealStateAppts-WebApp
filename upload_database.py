@@ -31,7 +31,9 @@ def cleaning_data(df):
     df_out = quitOutliers(df_out, 'appts_per_listing')
     df_out['listings'] = df_out['appts']/df_out['appts_per_listing']
 
-    df_out = df_out.groupby('zip_code').filter(lambda x: len(x) >= 72)
+    years = get_years(df_out)
+    enough_registers = (max(years)-min(years) + 1) * 24
+    df_out = df_out.groupby('zip_code').filter(lambda x: len(x) >= enough_registers)
     df_out.dropna(inplace=True)
     df_out = df_out.groupby(['zip_code', 'start_date']).agg(
         {'listings': 'sum','appts':'sum'}).reset_index(level=['start_date', 'zip_code'])

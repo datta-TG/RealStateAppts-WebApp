@@ -1,17 +1,26 @@
 import datetime
 import streamlit as st
 import plotly.graph_objects as go
+import plotly.express as px
 import pandas as pd
 from datetime import timedelta
-from model import LGBMRegressorModel
+from sklearn.linear_model import LinearRegression
 from tools.data_tools import *
 
 
+def linear_regresion(df):
+    df_out = df.copy(deep = True)
+    df_out['start_date'] = pd.to_datetime(df_out['start_date'], format='%Y-%m-%d')
+    fig = px.scatter(df_out, x="start_date", y="appts_per_listing", trendline="ols",title="Linear Regression",labels={
+                     "start_date": "Start dates",
+                     "appts_per_listing": "Appointments per Listings"
+                 })
 
+    st.plotly_chart(fig, use_container_width=True)
+        
 
 
 def page_prediction():
-    st.error("NOT WORKING")
     df = load_data()
     st.title("Prediction")
     st.header("Parameters Selection")
@@ -20,11 +29,12 @@ def page_prediction():
         list(set(df['zip_code'].values)))
 
     df_filtered_raw = df[df['zip_code'] == zip_code_option].sort_values(by='start_date')
-    last_date_row = df_filtered_raw.iloc[-1]
+    st.write(df_filtered_raw)
+    linear_regresion(df_filtered_raw)
+
+    
+"""    last_date_row = df_filtered_raw.iloc[-1]
     last_date = datetime.datetime.strptime(last_date_row['start_date'], '%Y-%m-%d').date()
-
-
-
     date_option = st.date_input(
         "Select a start date, remember predictions are only done with first or last two weeks of each month", datetime.date.today(), max_value = datetime.date.today() + timedelta(days = 365),min_value= to_start_date(last_date + timedelta(days = 16)))
     start_date_option = to_start_date(date_option)
@@ -64,4 +74,4 @@ def page_prediction():
 
         
         st.plotly_chart(fig, use_container_width=True)
-
+"""
