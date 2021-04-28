@@ -1,4 +1,3 @@
-import pycaret.regression as pycarss
 from tools.data_tools import *
 from statsmodels.tsa.arima.model import ARIMA
 import streamlit as st
