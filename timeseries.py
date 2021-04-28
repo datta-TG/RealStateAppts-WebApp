@@ -5,7 +5,6 @@ from scipy import signal
 from tools.data_tools import *
 
 
-
 @st.cache()
 def calculate_periods():
     months_name = ['January', 'February', 'March', 'April', 'May', 'June',
@@ -27,6 +26,7 @@ def filter_item(row):
         else:
             return row['appts_per_listing'].to_numpy()[0]
 
+
 def period_plot(df,periods,subheader,years,dictionary_encoding):
 
     if(len(periods) != 0):
@@ -41,9 +41,9 @@ def period_plot(df,periods,subheader,years,dictionary_encoding):
         st.subheader(subheader)
         st.plotly_chart(fig, use_container_width=True)
 
+
 def plot_time_series(df, years, subheader,periods,periods_number,seasonality = False, df_seasonality = None):
     if(len(years) != 0):
-
         fig = go.Figure()
         for year in years:
             y_edge = [filter_item(df[df['start_date'] == str(
@@ -57,44 +57,32 @@ def plot_time_series(df, years, subheader,periods,periods_number,seasonality = F
                 fig.add_trace(go.Scatter(x=periods, y=y_edge_seasonality,
                                      mode='lines+markers',
                                      name=str(year) + '- No seasonality', connectgaps=True))
-
-
         st.subheader(subheader)
         st.plotly_chart(fig, use_container_width=True)
 
 def show_plots(df,years_list,periods_list,periods_number_list,dictionary_encoding,key = 1):
     st.subheader("Time series plot")
     df_without_seasonality = quitSeasonality(df)
-    if(not has_stacionality(df)):
-        st.warning("Seasonality is not detected in this zip")
-    else:
-        st.success("Seasonality detected")
+    df_diff = df.copy(deep = True)
+    df_diff['appts_per_listing'] = df['appts_per_listing'].diff().replace(np.nan, 0)
+    
     years = st.multiselect(
         'Select the years you want to visualize', years_list,key = (4*key))
-    seasonality_year_checkbox = st.checkbox("Show without seasonality",key= (4*key)+1)
-    
+    seasonality_year_checkbox = st.checkbox("Show difference",key= (4*key)+1)
+
     plot_time_series(df, years, 'Historical Plot',periods_list,periods_number_list)
     if(seasonality_year_checkbox):
-        plot_time_series(df_without_seasonality, years, 'Historical Plot - without Seasonality',periods_list,periods_number_list)
-
+        plot_time_series(df_diff, years, 'Historical Plot - Difference',periods_list,periods_number_list)
 
     st.subheader("Period comparison plot")
     periods = st.multiselect(
         'Select the periods you want to visualize', periods_list,key= (4*key)+2)
-    seasonality_periods_checkbox = st.checkbox("Show without seasonality",key= (4*key)+3)
-
     period_plot(df,periods,'Period Plot',years_list,dictionary_encoding)
-
-    if(seasonality_periods_checkbox):
-        period_plot(df_without_seasonality,periods,'Period Plot - without Seasonality',years_list,dictionary_encoding)
 
 def quitSeasonality(df):
     
     df_out = df.copy(deep=True)
     df_out['appts_per_listing'] = signal.detrend(df_out['appts_per_listing'])
-
-    #scaler = MinMaxScaler()
-    #df_out['appts_per_listing'] = scaler.fit_transform(df_out['appts_per_listing'].values.reshape(-1, 1))
 
     df_out['appts_per_listing'] = df_out['appts_per_listing'] - min(df_out['appts_per_listing'].to_numpy())
     return df_out

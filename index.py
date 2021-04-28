@@ -13,8 +13,6 @@ def config_sub_menu():
 
     st.sidebar.subheader("Configuration Submenu")
     page = st.sidebar.radio("Select your page", tuple(configPages.keys()))
-
-
     # Display the selected page
     configPages[page]()
 
